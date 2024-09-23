@@ -1,0 +1,48 @@
+# Define versions for dependencies
+
+[versions]
+kotlin = "2.0.20"  # Kotlin version
+springBoot = "3.3.3"  # Spring Boot version
+springDependencyManagement = "1.1.6"  # Spring Dependency Management version
+mockitoKotlin = "5.4.0"  # Mockito Kotlin version
+bootstrap = "3.4.0"  # Bootstrap version
+detekt = "1.23.6"  # Detekt version
+jquery = "3.6.1"  # jQuery version
+commonsValidator = "1.6"  # Apache Commons Validator version
+guava = "31.1-jre"  # Google Guava version
+
+# Define plugins with their respective IDs and version references
+[plugins]
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin"}  # Kotlin Spring plugin
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin"}  # Kotlin JPA plugin
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }  # Spring Boot plugin
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }  # Spring Dependency Management plugin
+
+# Define libraries with their respective modules and version references
+[libraries]
+# Gradle plugins
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }  # Kotlin Gradle plugin
+detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }  # Detekt Gradle plugin
+
+# Kotlin dependencies
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }  # Kotlin Reflect library
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }  # Kotlin Test library
+
+# Spring Boot managed dependencies
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }  # Spring Boot Starter
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }  # Spring Boot Starter Web
+spring-boot-starter-hateoas = { module = "org.springframework.boot:spring-boot-starter-hateoas" }  # Spring Boot Starter HATEOAS
+spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }  # Spring Boot Starter JDBC
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }  # Spring Boot Starter Data JPA
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }  # Spring Boot Starter Test
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }  # JUnit Jupiter
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }  # JUnit Platform Launcher
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5" }  # Apache HttpClient 5
+hsqldb = { module = "org.hsqldb:hsqldb"}  # HSQLDB
+
+# Other dependencies
+bootstrap = { module = "org.webjars:bootstrap", version.ref = "bootstrap" }  # Bootstrap
+jquery = { module = "org.webjars:jquery", version.ref = "jquery" }  # jQuery
+commons-validator = { module = "commons-validator:commons-validator", version.ref = "commonsValidator" }  # Apache Commons Validator
+guava = { module = "com.google.guava:guava", version.ref = "guava" }  # Google Guava
+mockito-kotlin =  { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }  # Mockito Kotlin

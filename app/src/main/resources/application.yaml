@@ -1,0 +1,14 @@
+# Spring Datasource configuration
+spring:
+  datasource:
+    # URL of the datasource.
+    url: jdbc:hsqldb:mem:.
+    # Username for the datasource.
+    username: sa
+    # Password for the datasource (empty in this case).
+    password:
+    # Driver class name for the datasource.
+    driverClassName: org.hsqldb.jdbc.JDBCDriver
+  jpa:
+    # Disables the Open Session in View pattern.
+    open-in-view: false
