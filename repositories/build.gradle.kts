@@ -18,6 +18,9 @@ dependencies {
 
     // Add the Spring Boot Starter Data JPA library as an implementation dependency
     implementation(libs.spring.boot.starter.data.jpa)
+
+    // Add the HTTP request library OkHttp as an implementation dependency
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 }
 
 dependencyManagement {

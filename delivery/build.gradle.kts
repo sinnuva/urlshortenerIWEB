@@ -31,6 +31,9 @@ dependencies {
     // Include Google Guava as an implementation dependency
     implementation(libs.guava)
 
+    implementation("io.github.cdimascio:java-dotenv:5.2.2")
+
+
     // Include Kotlin Test as a test implementation dependency
     testImplementation(libs.kotlin.test)
 

@@ -5,6 +5,7 @@ import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
 import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.SafeUrlServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
@@ -43,6 +44,12 @@ class ApplicationConfiguration(
      */
     @Bean
     fun validatorService() = ValidatorServiceImpl()
+    /**
+     * Provides an implementation of the SafeUrlService.
+     * @return an instance of SafeUrlServiceImpl.
+     */
+    @Bean
+    fun safeUrlService() = SafeUrlServiceImpl()
 
     /**
      * Provides an implementation of the HashService.
@@ -52,7 +59,8 @@ class ApplicationConfiguration(
     fun hashService() = HashServiceImpl()
 
     /**
-     * Provides an implementation of the RedirectUseCase.
+     * Provides an implementation of the     implementation("io.github.cdimascio:java-dotenv:5.2.2")
+     RedirectUseCase.
      * @return an instance of RedirectUseCaseImpl.
      */
     @Bean
@@ -71,5 +79,5 @@ class ApplicationConfiguration(
      */
     @Bean
     fun createShortUrlUseCase() =
-        CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+        CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), safeUrlService())
 }

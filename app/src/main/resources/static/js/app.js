@@ -29,6 +29,22 @@ $(document).ready(
                             + "'>"
                             + request.getResponseHeader('Location')
                             + "</a></div>");
+                        //We get the "safe" attribute from the response and display a message accordingly
+                        if (msg.safe === true) {
+                            $("#feedback").html(
+                                "<div class='alert alert-info lead'><strong>URL is safe</strong></div>"
+                            );
+                        } else if (msg.safe === false) {
+                            $("#feedback").html(
+                                "<div class='alert alert-danger lead'><strong>URL is NOT safe</strong></div>"
+                            );
+                        } else {
+                            // Fallback if msg.safe is undefined
+                            $("#feedback").html(
+                                "<div class='alert alert-warning lead'><strong>Unable to determine URL safety</strong></div>"
+                            );
+                        }
+                        
                     },
                     /**
                      * Handles the AJAX error response.

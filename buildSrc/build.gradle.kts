@@ -14,3 +14,8 @@ dependencies {
     // Adds the Detekt Gradle plugin as a dependency.
     implementation(libs.detekt.gradle.plugin)
 }
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}

@@ -27,8 +27,9 @@ interface CreateShortUrlUseCase {
 class CreateShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService,
     private val validatorService: ValidatorService,
-    private val hashService: HashService
-) : CreateShortUrlUseCase {
+    private val hashService: HashService,
+    private val safeUrlService: SafeUrlService
+) : CreateShortUrlUseCase { 
     /**
      * Creates a short URL for the given URL and optional data.
      *
@@ -44,7 +45,7 @@ class CreateShortUrlUseCaseImpl(
                 hash = id,
                 redirection = Redirection(target = url),
                 properties = ShortUrlProperties(
-                    safe = data.safe,
+                    safe = safeCall { safeUrlService.isSafe(url) },
                     ip = data.ip,
                     sponsor = data.sponsor
                 )

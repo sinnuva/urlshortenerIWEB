@@ -40,3 +40,5 @@ README_files
 
 ### Other ###
 .DS_Store
+
+delivery/src/main/resources/.env
