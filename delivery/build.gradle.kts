@@ -33,6 +33,7 @@ dependencies {
 
     implementation("io.github.cdimascio:java-dotenv:5.2.2")
 
+    implementation("org.json:json:20210307")
 
     // Include Kotlin Test as a test implementation dependency
     testImplementation(libs.kotlin.test)

@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing
 import es.unizar.urlshortener.core.HashService
 import es.unizar.urlshortener.core.ValidatorService
 import es.unizar.urlshortener.core.SafeUrlService
+import org.json.JSONObject
 import org.apache.commons.validator.routines.UrlValidator
 import java.nio.charset.StandardCharsets
 
@@ -54,50 +55,57 @@ class SafeUrlServiceImpl : SafeUrlService {
     private val dotenv = Dotenv.load()
     private val googleSafeBrowsingApiKey: String? = dotenv["GOOGLE_SAFE_BROWSING_API_KEY"]
 
-
     override fun isSafe(input: String): Boolean {
-        val endpoint = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$googleSafeBrowsingApiKey"
-        
-            // Launch a coroutine for network operations
-            val url = URL(endpoint)
-            val openedConnection = url.openConnection() as HttpURLConnection
-            openedConnection.requestMethod = "POST"
-            openedConnection.doOutput = true
-            openedConnection.setRequestProperty("Content-Type", "application/json")
+    // Check if the API key is valid
+    require(!googleSafeBrowsingApiKey.isNullOrEmpty()) { "Google Safe Browsing API key is not set" }
 
-            // Creating the JSON body for the POST request
-            val requestBody = """
-            {
-              "client": {
-                "clientId": "url-shortener",
-                "clientVersion": "1.5.2"
-              },
-              "threatInfo": {
-                "threatTypes": ["MALWARE, SOCIAL_ENGINEERING"],
-                "platformTypes": ["WINDOWS"],
-                "threatEntryTypes": ["URL"],
-                "threatEntries": [
-                  {"url": "$input"}
-                ]
-              }
-            }
-            """.trimIndent()
 
-            openedConnection.outputStream.use { os ->
-                val inputBytes = requestBody.toByteArray()
-                os.write(inputBytes, 0, inputBytes.size)
-            }
+    val endpoint = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$googleSafeBrowsingApiKey"
+      // Set up the URL connection
+      val url = URL(endpoint)
+      val openedConnection = url.openConnection() as HttpURLConnection
+      openedConnection.requestMethod = "POST"
+      openedConnection.doOutput = true
+      openedConnection.setRequestProperty("Content-Type", "application/json")
 
-            // Get the response code
-            val responseCode = openedConnection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val scanner = Scanner(openedConnection.inputStream)
-                //val response = scanner.useDelimiter("\\A").next()
-                scanner.close()
-                return true
-            } else {
-                return false
-            }
-        
+      // JSON body for the POST request
+      val requestBody = """
+      {
+        "client": {
+          "clientId": "url-shortener",
+          "clientVersion": "1.5.2"
+        },
+        "threatInfo": {
+          "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],
+          "platformTypes": ["ANY_PLATFORM"],
+          "threatEntryTypes": ["URL"],
+          "threatEntries": [
+            {"url": "$input"}
+          ]
+        }
+      }
+      """.trimIndent()
+
+      // Send the request
+      openedConnection.outputStream.use { os ->
+          val inputBytes = requestBody.toByteArray()
+          os.write(inputBytes, 0, inputBytes.size)
+      }
+
+      // Get the response code
+      val responseCode = openedConnection.responseCode
+      if (responseCode == HttpURLConnection.HTTP_OK) {
+          // Read the response and parse it as JSON
+          val response = openedConnection.inputStream.bufferedReader().use { it.readText() }
+          // Parse the response JSON
+          val jsonResponse = JSONObject(response)
+          // Check if the "matches" array is present and has elements
+          val matches = jsonResponse.optJSONArray("matches")
+          return !(matches != null && matches.length() > 0)
+      } else {
+          return false
+      }
+
     }
 }
+

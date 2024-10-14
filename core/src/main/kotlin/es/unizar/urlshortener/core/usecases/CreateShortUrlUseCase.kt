@@ -29,7 +29,8 @@ class CreateShortUrlUseCaseImpl(
     private val validatorService: ValidatorService,
     private val hashService: HashService,
     private val safeUrlService: SafeUrlService
-) : CreateShortUrlUseCase { 
+) : CreateShortUrlUseCase {
+
     /**
      * Creates a short URL for the given URL and optional data.
      *
@@ -40,18 +41,26 @@ class CreateShortUrlUseCaseImpl(
      */
     override fun create(url: String, data: ShortUrlProperties): ShortUrl =
         if (safeCall { validatorService.isValid(url) }) {
+            // Generate the hash for the URL
             val id = safeCall { hashService.hasUrl(url) }
+
+            // Check if the URL is safe
+            val isSafeUrl = safeCall { safeUrlService.isSafe(url) }
+
+            // Create the ShortUrl entity
             val su = ShortUrl(
                 hash = id,
                 redirection = Redirection(target = url),
                 properties = ShortUrlProperties(
-                    safe = safeCall { safeUrlService.isSafe(url) },
+                    safe = isSafeUrl,
                     ip = data.ip,
                     sponsor = data.sponsor
                 )
             )
+            // Save the ShortUrl entity
             safeCall { shortUrlRepository.save(su) }
         } else {
             throw InvalidUrlException(url)
         }
 }
+
