@@ -99,11 +99,12 @@ class UrlShortenerControllerImpl(
         ).run {
             val h = HttpHeaders()
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(hash, request) }.toUri()
+            val safeURL = properties.safe
             h.location = url
             val response = ShortUrlDataOut(
                 url = url,
                 properties = mapOf(
-                    "safe" to properties.safe
+                    "safe" to safeURL
                 )
             )
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)

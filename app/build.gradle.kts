@@ -62,3 +62,10 @@ configurations.matching { it.name == "detekt" }.all {
         }
     }
 }
+tasks.test {
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true // This allows standard output to be shown
+    }
+}
+

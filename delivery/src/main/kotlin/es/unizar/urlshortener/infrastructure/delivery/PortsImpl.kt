@@ -58,16 +58,17 @@ class SafeUrlServiceImpl : SafeUrlService {
     override fun isSafe(input: String): Boolean {
     // Check if the API key is valid
     require(!googleSafeBrowsingApiKey.isNullOrEmpty()) { "Google Safe Browsing API key is not set" }
-
+    println("Checking URL safety for: $input")
 
     val endpoint = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$googleSafeBrowsingApiKey"
       // Set up the URL connection
       val url = URL(endpoint)
+      println("URL: $url")
+      println("API Key: $googleSafeBrowsingApiKey")
       val openedConnection = url.openConnection() as HttpURLConnection
       openedConnection.requestMethod = "POST"
       openedConnection.doOutput = true
       openedConnection.setRequestProperty("Content-Type", "application/json")
-
       // JSON body for the POST request
       val requestBody = """
       {
@@ -97,6 +98,7 @@ class SafeUrlServiceImpl : SafeUrlService {
       if (responseCode == HttpURLConnection.HTTP_OK) {
           // Read the response and parse it as JSON
           val response = openedConnection.inputStream.bufferedReader().use { it.readText() }
+          println("Response: $response")
           // Parse the response JSON
           val jsonResponse = JSONObject(response)
           // Check if the "matches" array is present and has elements

@@ -73,13 +73,27 @@ class HttpRequestTest {
      */
     @Test
     fun `redirectTo returns a redirect when the key exists`() {
-        val target = shortUrl("http://example.com/").headers.location
-        require(target != null)
+        // Assuming the short URL creation is necessary before testing redirect
+        val shortUrlResponse = shortUrl("http://example.com/")
+        val target = shortUrlResponse.headers.location
+        require(target != null) { "Target location should not be null after creating a short URL." }
+
+        // Debugging output
+        println("Created Short URL: $target")
+
         val response = restTemplate.getForEntity(target, String::class.java)
+
+        // Debugging output
+        println("Redirect Response Status: ${response.statusCode}")
+        println("Redirect Response Location: ${response.headers.location}")
+
         assertThat(response.statusCode).isEqualTo(HttpStatus.TEMPORARY_REDIRECT)
         assertThat(response.headers.location).isEqualTo(URI.create("http://example.com/"))
 
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(1)
+        // Debugging the database state
+        val clickCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")
+        println("Rows in 'click' table after redirect: $clickCount")
+        assertThat(clickCount).isEqualTo(1)
     }
 
     /**
@@ -100,12 +114,23 @@ class HttpRequestTest {
     fun `creates returns a basic redirect if it can compute a hash`() {
         val response = shortUrl("http://example.com/")
 
+        // Debugging output
+        println("Response Status: ${response.statusCode}")
+        println("Response Location: ${response.headers.location}")
+        println("Response Body: ${response.body}")
+
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
         assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/f684a3c4"))
         assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/f684a3c4"))
 
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
+        // Debugging the database state
+        val shortUrlCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")
+        println("Rows in 'shorturl' table: $shortUrlCount")
+        assertThat(shortUrlCount).isEqualTo(1)
+
+        val clickCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")
+        println("Rows in 'click' table: $clickCount")
+        assertThat(clickCount).isEqualTo(0)
     }
 
     /**
@@ -130,6 +155,32 @@ class HttpRequestTest {
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(0)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     }
+    @Test
+    fun `creates a malicious URL`() {
+        val response = shortUrl("https://malware.wicar.org/")
+
+        // Debugging: Print the entire response
+        println("Response body: ${response.body}")
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        // Extract the 'safe' property from the map
+        val safeValue = response.body?.properties?.get("safe") as? Boolean
+        println("Safe property value: $safeValue")
+
+        // Assert that the 'safe' property is false for the malicious URL
+        assertThat(safeValue).isEqualTo(false)
+
+        // Database checks
+        val shortUrlCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")
+        println("Rows in 'shorturl' table: $shortUrlCount")
+        assertThat(shortUrlCount).isEqualTo(1)
+
+        val clickCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")
+        println("Rows in 'click' table: $clickCount")
+        assertThat(clickCount).isEqualTo(0)
+    }
+
 
     /**
      * Creates a short URL for the given URL.

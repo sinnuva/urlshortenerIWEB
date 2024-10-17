@@ -39,28 +39,32 @@ class CreateShortUrlUseCaseImpl(
      * @return The created [ShortUrl] entity.
      * @throws InvalidUrlException if the URL is not valid.
      */
-    override fun create(url: String, data: ShortUrlProperties): ShortUrl =
-        if (safeCall { validatorService.isValid(url) }) {
-            // Generate the hash for the URL
-            val id = safeCall { hashService.hasUrl(url) }
+    override fun create(url: String, data: ShortUrlProperties): ShortUrl {
+    // Validate the URL
+    if (!safeCall { validatorService.isValid(url) }) {
+        throw InvalidUrlException(url)
+    }
 
-            // Check if the URL is safe
-            val isSafeUrl = safeCall { safeUrlService.isSafe(url) }
+    // Generate the hash for the URL
+    val id = safeCall { hashService.hasUrl(url) }
+    
+    // Check if the URL is safe
+    val isSafeUrl = safeCall { safeUrlService.isSafe(url) }
 
-            // Create the ShortUrl entity
-            val su = ShortUrl(
-                hash = id,
-                redirection = Redirection(target = url),
-                properties = ShortUrlProperties(
-                    safe = isSafeUrl,
-                    ip = data.ip,
-                    sponsor = data.sponsor
-                )
-            )
-            // Save the ShortUrl entity
-            safeCall { shortUrlRepository.save(su) }
-        } else {
-            throw InvalidUrlException(url)
-        }
+    // Create the ShortUrl entity
+    val shortUrl = ShortUrl(
+        hash = id,
+        redirection = Redirection(target = url),
+        properties = ShortUrlProperties(
+            safe = isSafeUrl,
+            ip = data.ip, // Ensure nullability is handled appropriately
+            sponsor = data.sponsor
+        )
+    )
+    
+    // Save the ShortUrl entity
+    return safeCall { shortUrlRepository.save(shortUrl) }
+}
+
 }
 
