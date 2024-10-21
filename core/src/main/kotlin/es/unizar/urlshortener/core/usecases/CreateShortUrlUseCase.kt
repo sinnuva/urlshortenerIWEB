@@ -47,9 +47,9 @@ class CreateShortUrlUseCaseImpl(
             // Validar la URL de manera asincrónica
             val isValid = validatorService.isValid(url)
             
-            if (!isValid) {
+            /*if (!isValid) {
                 throw InvalidUrlException(url)
-            }
+            }*/
         }
 
         // Generate the hash for the URL
@@ -71,15 +71,14 @@ class CreateShortUrlUseCaseImpl(
         )
 
         // Validar la URL de manera asincrónica con una coroutine
-        GlobalScope.launch {
+        /*GlobalScope.launch {
             validateUrlAsync(url, id)
-        }
+        }*/
 
         // Save the ShortUrl entity
         return safeCall { shortUrlRepository.save(shortUrl) }
     }
-
-
+    
     private suspend fun validateUrlAsync(url: String, hash: String) {
         try {
             val isValid = validatorService.isValid(url)

@@ -132,6 +132,7 @@ class SafeUrlServiceImpl : SafeUrlService {
           val jsonResponse = JSONObject(response)
           // Check if the "matches" array is present and has elements
           val matches = jsonResponse.optJSONArray("matches")
+          println("Matches: $matches")
           return !(matches != null && matches.length() > 0)
       } else {
           return false

@@ -157,7 +157,7 @@ class HttpRequestTest {
     }
     @Test
     fun `creates a malicious URL`() {
-        val response = shortUrl("https://malware.wicar.org/")
+        val response = shortUrl("http://testsafebrowsing.appspot.com/s/malware.html")
 
         // Debugging: Print the entire response
         println("Response body: ${response.body}")
