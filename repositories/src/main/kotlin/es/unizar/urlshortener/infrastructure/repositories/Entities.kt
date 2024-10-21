@@ -40,5 +40,25 @@ class ShortUrlEntity(
     val mode: Int,
     val safe: Boolean,
     val ip: String?,
-    val country: String?
+    val country: String?,
+    var validationStatus: ValidationStatus = ValidationStatus.PENDING
 )
+
+/**
+ * Enum class that represents the validation status of a [ShortUrl].
+ */
+enum class ValidationStatus {
+    PENDING,
+    REACHABLE,
+    UNREACHABLE
+}
+
+/**
+ * The [ValidationStatus] enum represents the validation status of a short URL.
+ */
+data class ShortUrl(
+    val hash: String,
+    val target: String,
+    var validationStatus: ValidationStatus // Enum en el dominio
+)
+

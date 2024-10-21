@@ -35,6 +35,9 @@ dependencies {
 
     implementation("org.json:json:20210307")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0") // Asegúrate de que esta línea esté
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.0") // Si trabajas con JDK 8
+
     // Include Kotlin Test as a test implementation dependency
     testImplementation(libs.kotlin.test)
 

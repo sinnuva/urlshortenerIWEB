@@ -7,6 +7,9 @@ import es.unizar.urlshortener.core.SafeUrlService
 import org.json.JSONObject
 import org.apache.commons.validator.routines.UrlValidator
 import java.nio.charset.StandardCharsets
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.springframework.stereotype.Service
 
 //Google API check imports
 import java.net.HttpURLConnection
@@ -17,17 +20,43 @@ import kotlin.Exception
 
 
 
-/**
- * Implementation of the port [ValidatorService].
- */
+@Service
 class ValidatorServiceImpl : ValidatorService {
+
     /**
      * Validates the given URL.
      *
      * @param url the URL to validate
-     * @return true if the URL is valid, false otherwise
+     * @return true if the URL is valid in format and reachable, false otherwise
      */
-    override fun isValid(url: String) = urlValidator.isValid(url)
+    override suspend fun isValid(url: String): Boolean {
+        // Primero, validar el formato de la URL
+        if (!urlValidator.isValid(url)) {
+            return false
+        }
+
+        // Luego, validar si la URL es accesible (retorna HTTP 200)
+        return isUrlReachable(url)
+    }
+
+    /**
+     * Verifica si la URL es accesible realizando una solicitud HTTP GET.
+     */
+    private suspend fun isUrlReachable(url: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 5000 // Tiempo de espera (opcional)
+                connection.connect()
+
+                // Retorna true si el código de respuesta es 200 OK
+                connection.responseCode == HttpURLConnection.HTTP_OK
+            } catch (e: Exception) {
+                false // Si hay una excepción, asumimos que la URL no es accesible
+            }
+        }
+    }
 
     companion object {
         /**

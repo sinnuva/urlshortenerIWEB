@@ -56,7 +56,7 @@ interface ValidatorService {
      * @param url The URL to be validated.
      * @return True if the URL is valid, false otherwise.
      */
-    fun isValid(url: String): Boolean
+    suspend fun isValid(url: String): Boolean
 }
 
 /**

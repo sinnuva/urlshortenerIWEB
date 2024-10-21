@@ -5,6 +5,9 @@ import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.UrlNotFoundException
+import es.unizar.urlshortener.core.UrlNotReachableException
+import es.unizar.urlshortener.core.UrlNotValidatedException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -73,13 +76,34 @@ class UrlShortenerControllerImpl(
      * @return a ResponseEntity with the redirection details
      */
     @GetMapping("/{id:(?!api|index).*}")
-    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
-        redirectUseCase.redirectTo(id).run {
+    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
+        return try {
+            // Lógica de redirección
+            val targetUrl = redirectUseCase.redirectTo(id)
+
+            // Registrar el clic
             logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
-            val h = HttpHeaders()
-            h.location = URI.create(target)
-            ResponseEntity<Unit>(h, HttpStatus.valueOf(mode))
+
+            // Configurar los headers de redirección
+            val headers = HttpHeaders()
+            headers.location = URI.create(targetUrl.target)
+
+            ResponseEntity(headers, HttpStatus.valueOf(targetUrl.mode))
+        } catch (e: UrlNotValidatedException) {
+            // Si la URL aún no ha sido validada
+            ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(null) // No hay cuerpo en la respuesta
+        } catch (e: UrlNotReachableException) {
+            // Si la URL no es alcanzable
+            ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(null)
+        } catch (e: UrlNotFoundException) {
+            // Si la URL no existe
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(null)
         }
+    }
+
 
     /**
      * Creates a short url from details provided in [data].

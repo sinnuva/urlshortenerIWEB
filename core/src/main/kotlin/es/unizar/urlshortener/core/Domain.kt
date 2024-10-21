@@ -19,8 +19,18 @@ data class ShortUrl(
     val hash: String,
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
-    val properties: ShortUrlProperties = ShortUrlProperties()
+    val properties: ShortUrlProperties = ShortUrlProperties(),
+    var validationStatus: ValidationStatus = ValidationStatus.PENDING
 )
+
+/**
+ * Enum class that represents the validation status of a [ShortUrl].
+ */
+enum class ValidationStatus {
+    PENDING,
+    REACHABLE,
+    UNREACHABLE
+}
 
 /**
  * A [Redirection] specifies the [target] and the [status code][mode] of a redirection.

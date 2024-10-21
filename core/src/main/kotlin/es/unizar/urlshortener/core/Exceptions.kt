@@ -56,3 +56,19 @@ inline fun <T> safeCall(
     onSuccess = { it },
     onFailure = { throw onFailure(it) }
 )
+
+/**
+ * An exception indicating that a URL has not been validated.
+ */
+class UrlNotValidatedException(message: String) : RuntimeException(message)
+
+/**
+ * An exception indicating that a URL is not reachable.
+ */
+class UrlNotReachableException(message: String) : RuntimeException(message)
+
+/**
+ * An exception indicating that a URL was not found.
+ */
+class UrlNotFoundException(message: String) : RuntimeException(message)
+

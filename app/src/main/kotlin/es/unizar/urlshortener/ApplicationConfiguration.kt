@@ -13,7 +13,8 @@ import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServ
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.client.WebClient
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
  *

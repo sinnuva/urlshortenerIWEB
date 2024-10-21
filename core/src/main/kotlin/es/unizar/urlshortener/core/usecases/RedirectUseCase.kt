@@ -7,6 +7,10 @@ import es.unizar.urlshortener.core.ClickRepositoryService
 import es.unizar.urlshortener.core.TooManyRequestsException
 import java.time.OffsetDateTime
 import es.unizar.urlshortener.core.safeCall
+import es.unizar.urlshortener.core.UrlNotReachableException
+import es.unizar.urlshortener.core.UrlNotValidatedException
+import es.unizar.urlshortener.core.ValidationStatus
+
 
 /**
  * Given a key returns a [Redirection] that contains a [URI target][Redirection.target]
@@ -57,6 +61,14 @@ class RedirectUseCaseImpl(
 
         val shortUrl = shortUrlRepository.findByKey(key) ?: throw RedirectionNotFound(key)
 
-        return@safeCall shortUrl.redirection
+         when (shortUrl.validationStatus) {
+            ValidationStatus.PENDING -> throw UrlNotValidatedException("Validation is pending for URL with key: $key")
+            ValidationStatus.UNREACHABLE -> throw UrlNotReachableException("URL with key: $key is unreachable")
+            ValidationStatus.REACHABLE -> {
+                // Si es alcanzable, proceder con la redirección
+                return@safeCall shortUrl.redirection
+            }
+            else -> throw IllegalStateException("Unknown validation status for URL with key: $key")
+        }
     } ?: throw RedirectionNotFound(key)
 }

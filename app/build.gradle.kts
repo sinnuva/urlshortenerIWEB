@@ -24,6 +24,9 @@ dependencies {
     // Adds jQuery as an implementation dependency.
     implementation(libs.jquery)
 
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
     // Adds HSQLDB as a runtime-only dependency.
     runtimeOnly(libs.hsqldb)
     // Adds Kotlin reflection library as a runtime-only dependency.
