@@ -8,6 +8,10 @@ import org.json.JSONObject
 import org.apache.commons.validator.routines.UrlValidator
 import java.nio.charset.StandardCharsets
 
+// URL is reachable check imports
+import java.net.MalformedURLException
+import java.io.IOException
+
 //Google API check imports
 import java.net.HttpURLConnection
 import java.net.URL
@@ -15,26 +19,41 @@ import java.util.*
 import io.github.cdimascio.dotenv.Dotenv
 import kotlin.Exception
 
+const val TIMEOUT = 5000 // Tiempo de espera de 5 segundos
 
 
 /**
  * Implementation of the port [ValidatorService].
  */
 class ValidatorServiceImpl : ValidatorService {
+    
+    private val urlValidator = UrlValidator(arrayOf("http", "https"))
     /**
      * Validates the given URL.
      *
      * @param url the URL to validate
      * @return true if the URL is valid, false otherwise
      */
-    override fun isValid(url: String) = urlValidator.isValid(url)
-
-    companion object {
-        /**
-         * A URL validator that supports HTTP and HTTPS schemes.
-         */
-        val urlValidator = UrlValidator(arrayOf("http", "https"))
+    override fun isValid(url: String): Boolean {
+      if (!urlValidator.isValid(url)) {
+            return false
+        }
+      return try {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.connectTimeout = TIMEOUT
+        connection.connect()
+        // Verifica si la respuesta HTTP es 200 (OK)
+        connection.responseCode == HttpURLConnection.HTTP_OK
+      } catch (e: MalformedURLException) {
+          println("URL is malformed: ${e.message}")
+          false
+      } catch (e: IOException) {
+          println("Error connecting to URL: ${e.message}")
+          false
+      }
     }
+
 }
 
 /**

@@ -20,6 +20,9 @@ import java.net.URI
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import es.unizar.urlshortener.core.ValidatorService
 
 /**
  * Integration tests for HTTP requests.
@@ -34,6 +37,9 @@ class HttpRequestTest {
 
     @Autowired
     private lateinit var restTemplate: TestRestTemplate
+    
+    @Autowired
+    private lateinit var validatorService: ValidatorService
 
     /**
      * Sets up the test environment before each test.
@@ -181,6 +187,17 @@ class HttpRequestTest {
         assertThat(clickCount).isEqualTo(0)
     }
 
+    @Test
+    fun `should return true for a reachable URL`() {
+        val result = validatorService.isValid("https://www.google.com")
+        assertTrue(result)
+    }
+
+    @Test
+    fun `should return false for an unreachable URL`() {
+        val result = validatorService.isValid("http://invalid-url.com")
+        assertFalse(result)
+    }
 
     /**
      * Creates a short URL for the given URL.
