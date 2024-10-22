@@ -1,6 +1,6 @@
 # Getting Started with the URL Shortener project
 
-2024-08-31
+2024-10-22
 
 ## 1. Project description
 
