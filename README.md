@@ -2,7 +2,23 @@
 
 2024-08-31
 
-## System requirements
+## 1. Project description
+
+This project consists of a Proof of Concept (PoC) which allows users to 
+generate a short URL given a long one. The application also validates if 
+the URL is rechable and safe before shortenening it. Moreover, it generates
+a QR code for each shortened URL, which can be scanned to access the original 
+one.
+
+## Main functionalities
+  - **QR code generation**:
+  - **URL reachability check**: verifies if the given URL is reachable before
+  shortening it.
+  - **Google ssafe browsing integration**:
+  - **Redirection limits**:
+
+
+## 2. Libraries and frameworks
 
 This application leverages cutting-edge technologies to deliver a robust
 and versatile user experience:
@@ -29,6 +45,50 @@ and versatile user experience:
     adopts a highly opinionated approach to the Spring platform and
     third-party libraries, enabling developers to initiate projects with
     minimal hassle.
+
+## Justification for the choice of libraries
+
+## 3. Challenges and solutions
+
+During the elaboration of this Proof of Concept some challenges were encountered:
+  - **QR code generation**:
+  - **URL reachability check**: initially, this feature was implemented 
+  asynchronously. But, given the fact that this part of the course was not 
+  covered yet, for the PoC, it was implemented synchronously. It will be done
+  asynchronously later on.
+  - **Google safe browsing integration**:
+  - **Redirection limits**:
+
+## Instructions to run the Proof of Concept
+
+## Prerequisites 
+  - Java 17
+  - Gradle
+  - Google Safe Browsing API key environment variable in .env file
+
+## Steps
+  1. Clone the repository
+  2. Run the project with ./gradlew bootRun
+  3. Application is available at http://localhost:8080
+
+## Use example
+
+## 5. Explanation of the tests
+
+  - **QR code generation**:
+  - **URL reachability check**: for this feature, there are implemented two basic tests.
+  The first one "should return true for a reachable URL" verifies that the service 
+  validates correctly a reachable URL, meaning it returns code HTTP 200.
+  The second one "should return false for an unreachable URL" verifies that the 
+  service detects correctly an unreachable URL; it does not return code HTTP 200.
+  - **Google safe browsing integration**:
+  - **Redirection limits**:
+
+
+
+
+
+
 
 ## Overall structure
 
