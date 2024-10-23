@@ -64,7 +64,7 @@ class ApplicationConfiguration(
      * @return an instance of RedirectUseCaseImpl.
      */
     @Bean
-    fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
+    fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService(), clickRepositoryService())
 
     /**
      * Provides an implementation of the LogClickUseCase.

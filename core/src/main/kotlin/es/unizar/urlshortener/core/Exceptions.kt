@@ -30,6 +30,14 @@ class InvalidUrlException(url: String) : DomainException("[$url] does not follow
 class RedirectionNotFound(key: String) : DomainException("[$key] is not known")
 
 /**
+ * An exception thrown when the redirection limit for a given URL is reached.
+ * This triggers a HTTP 429 Too Many Requests response.
+ *
+ * @param key The key of the URL that exceeded the redirection limit.
+ */
+class TooManyRequestsException(key: String) : DomainException("Redirection limit reached for [$key]")
+
+/**
  * An exception indicating an internal error within the application.
  * This exception can be used to represent unexpected issues that occur within the application,
  * providing both a message and a cause for the error.
@@ -46,5 +54,10 @@ inline fun <T> safeCall(
     block()
 }.fold(
     onSuccess = { it },
-    onFailure = { throw onFailure(it) }
+    onFailure = { exception ->
+        when (exception) {
+            is RedirectionNotFound, is TooManyRequestsException -> throw exception
+            else -> throw onFailure(exception)
+        }
+    }
 )
