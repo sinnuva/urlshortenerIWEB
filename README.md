@@ -57,7 +57,8 @@ During the elaboration of this Proof of Concept some challenges were encountered
   covered yet, for the PoC, it was implemented synchronously. It will be done
   asynchronously later on.
   - **Google safe browsing integration**:
-  - **Redirection limits**:
+  - **Redirection limits**: the first challenge encountered was deciding how to count the redirections of a shorturl in a period of time.To address this, a new method for the `clickRepositoryService` was implemented and the `RedirectUseCase` class was updated to be able to use this new method.
+  Additionally, a new type of exception had to be defined and handled. This was done in a very similar way to the other exceptions. However, the `safeCall` function also required modification to ensure these new exceptions were not captured and treated as internal errors.
 
 ## Instructions to run the Proof of Concept
 
@@ -82,7 +83,8 @@ During the elaboration of this Proof of Concept some challenges were encountered
   The second one "should return false for an unreachable URL" verifies that the 
   service detects correctly an unreachable URL; it does not return code HTTP 200.
   - **Google safe browsing integration**:
-  - **Redirection limits**:
+  - **Redirection limits**: The first test for this new feature was implemented in the `RedirectUseCaseTest` class. It ensures that whenever the countsOnTimeRange method of the clickRepositoryService returns ***MAX_REDIRECTIONS***, a ***TooManyRequestsException*** is thrown the next time a redirection is attempted for that key.
+  The second and final test was added to the `UrlShortenerControllerTest` class. It verifies that when a redirection triggers a ***TooManyRequestsException***, an **HTTP 429 status code** is returned, and no clicks are logged.
 
 
 

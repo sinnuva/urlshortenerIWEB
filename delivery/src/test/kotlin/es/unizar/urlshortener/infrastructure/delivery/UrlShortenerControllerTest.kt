@@ -81,6 +81,25 @@ class UrlShortenerControllerTest {
     }
 
     /**
+    * Tests that `redirectTo` returns a 429 Too Many Requests status when the limit is reached.
+    */
+    @Test
+    fun `redirectTo returns too many requests when the redirection limit is reached`() {
+        // Mock the behavior of redirectUseCase to throw a TooManyRequestsException
+        given(redirectUseCase.redirectTo("key"))
+            .willAnswer { throw TooManyRequestsException("key") }
+
+        // Perform a GET request and verify the response status is 429
+        mockMvc.perform(get("/{id}", "key"))
+            .andDo(print())
+            .andExpect(status().isTooManyRequests)
+            .andExpect(jsonPath("$.statusCode").value(429))
+
+        // Verify that logClickUseCase does not log the click
+        verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1"))
+    }
+
+    /**
      * Tests that `creates` returns a basic redirect if it can compute a hash.
      */
     @Test

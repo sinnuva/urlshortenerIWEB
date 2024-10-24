@@ -13,7 +13,7 @@ interface ClickRepositoryService {
      */
     fun save(cl: Click): Click
 
-        /**
+    /**
      * Counts the number of clicks in a given time range for a specific URL.
      *
      * @param hash The hash of the URL to count clicks for.
