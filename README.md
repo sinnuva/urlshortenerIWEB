@@ -11,7 +11,9 @@ a QR code for each shortened URL, which can be scanned to access the original
 one.
 
 ## Main functionalities
-  - **QR code generation**:
+  - **QR code generation**: Esta funcionalidad permite generar un código QR para cada URL acortada. El código QR se 
+   incluye en la respuesta cuando se acorta una URL, lo que permite a los usuarios compartir o escanear rápidamente 
+   el enlace para facilitar el acceso.
   - **URL reachability check**: verifies if the given URL is reachable before
   shortening it.
   - **Google ssafe browsing integration**:
@@ -51,7 +53,9 @@ and versatile user experience:
 ## 3. Challenges and solutions
 
 During the elaboration of this Proof of Concept some challenges were encountered:
-  - **QR code generation**:
+  - **QR code generation**: The implementation of QR code generation required selecting a library that could easily
+  integrate with the project. After evaluating several options, we chose the zginx because it was not only simple to 
+  use but also used in various GitHub projects, which gave us confidence.
   - **URL reachability check**: initially, this feature was implemented 
   asynchronously. But, given the fact that this part of the course was not 
   covered yet, for the PoC, it was implemented synchronously. It will be done
@@ -76,8 +80,14 @@ During the elaboration of this Proof of Concept some challenges were encountered
 
 ## 5. Explanation of the tests
 
-  - **QR code generation**:
-  - **URL reachability check**: for this feature, there are implemented two basic tests.
+  - **QR code generation**: To validate that the QR code generation feature works correctly, the test 
+  shouldReturnValidQRCode was implemented. This test simulates a request to shorten a URL and verifies that a QR code 
+  is generated as part of the response. The test begins by checking that the HTTP response has a status of 201 CREATED 
+  and that the location header and response body contain the expected shortened URL. Additionally, it ensures that the 
+  QR code is included and that it follows the expected format (data:image/png;base64,). The base64 string is decoded, 
+  and the resulting image is analyzed to confirm that it is valid and has positive dimensions (width and height greater
+  than 0), ensuring that the QR code was successfully generated.
+  - **URL reachability check**: For this feature, there are implemented two basic tests.
   The first one "should return true for a reachable URL" verifies that the service 
   validates correctly a reachable URL, meaning it returns code HTTP 200.
   The second one "should return false for an unreachable URL" verifies that the 
