@@ -5,11 +5,10 @@ import es.unizar.urlshortener.core.RedirectionNotFound
 import es.unizar.urlshortener.core.ShortUrlRepositoryService
 import es.unizar.urlshortener.core.ClickRepositoryService
 import es.unizar.urlshortener.core.TooManyRequestsException
+import es.unizar.urlshortener.core.MAX_REDIRECTIONS
+import es.unizar.urlshortener.core.PERIOD_IN_MINUTES
 import java.time.OffsetDateTime
 import es.unizar.urlshortener.core.safeCall
-
-const val MAX_REDIRECTIONS = 5
-const val PERIOD_IN_MINUTES = 1
 
 /**
  * Given a key returns a [Redirection] that contains a [URI target][Redirection.target]
