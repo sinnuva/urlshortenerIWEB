@@ -22,9 +22,6 @@ dependencies {
     // Add the HTTP request library OkHttp as an implementation dependency
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
-    implementation("com.google.zxing:core:3.4.1")     // ZXing core library
-    implementation("com.google.zxing:javase:3.4.1")   // ZXing Java SE support
-
 }
 
 dependencyManagement {
