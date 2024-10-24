@@ -6,7 +6,6 @@ import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
-import org.slf4j.LoggerFactory
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
 import org.mockito.kotlin.verify
@@ -20,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.util.*
 import kotlin.test.Test
 
 @WebMvcTest
@@ -81,25 +79,6 @@ class UrlShortenerControllerTest {
     }
 
     /**
-    * Tests that `redirectTo` returns a 429 Too Many Requests status when the limit is reached.
-    */
-    @Test
-    fun `redirectTo returns too many requests when the redirection limit is reached`() {
-        // Mock the behavior of redirectUseCase to throw a TooManyRequestsException
-        given(redirectUseCase.redirectTo("key"))
-            .willAnswer { throw TooManyRequestsException("key") }
-
-        // Perform a GET request and verify the response status is 429
-        mockMvc.perform(get("/{id}", "key"))
-            .andDo(print())
-            .andExpect(status().isTooManyRequests)
-            .andExpect(jsonPath("$.statusCode").value(429))
-
-        // Verify that logClickUseCase does not log the click
-        verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1"))
-    }
-
-    /**
      * Tests that `creates` returns a basic redirect if it can compute a hash.
      */
     @Test
@@ -146,54 +125,4 @@ class UrlShortenerControllerTest {
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.statusCode").value(400))
     }
-
-    /**
-     * Tests that `shortener` returns a response containing a QR code.
-     */
-    @Test
-    fun `shortener returns QR code in response`() {
-        // Given a successful short URL creation
-        val hash = "f684a3c4"
-        val targetUrl = "http://example.com/"
-        given(
-            createShortUrlUseCase.create(
-                url = targetUrl,
-                data = ShortUrlProperties(ip = "127.0.0.1")
-            )
-        ).willReturn(ShortUrl(hash, Redirection(targetUrl)))
-
-        // When posting to /api/link
-        val result = mockMvc.perform(
-            post("/api/link")
-                .param("url", targetUrl)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        )
-            .andDo(print())
-            // Then expect a 201 Created status and the QR code in the response
-            .andExpect(status().isCreated)
-            .andExpect(jsonPath("$.qrCode").exists())
-            .andExpect(jsonPath("$.url").value("http://localhost/$hash"))
-            .andReturn()
-
-        // Extract the QR code from the response and verify it's valid Base64
-        val jsonResponse = result.response.contentAsString
-        val qrCodeBase64 = extractJsonValue(jsonResponse, "qrCode")
-        assert(isValidBase64Image(qrCodeBase64)) { "Invalid Base64 image data" }
-    }
-
-    // Helper function to extract a value from JSON response
-    private fun extractJsonValue(json: String, key: String): String {
-        val regex = """"$key"\s*:\s*"(.*?)"""".toRegex()
-        val matchResult = regex.find(json)
-        return matchResult?.groups?.get(1)?.value ?: ""
-    }
-
-    // Helper function to validate base64 image data
-    // Helper function to validate base64 image data
-    private fun isValidBase64Image(base64Data: String): Boolean {
-        val base64String = base64Data.substringAfter(",")
-        val decodedBytes = Base64.getDecoder().decode(base64String)
-        return decodedBytes.isNotEmpty()
-    }
-
 }

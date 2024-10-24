@@ -23,6 +23,9 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 import es.unizar.urlshortener.core.ValidatorService
+import java.io.ByteArrayInputStream
+import java.util.*
+import javax.imageio.ImageIO
 
 /**
  * Integration tests for HTTP requests.
@@ -216,5 +219,35 @@ class HttpRequestTest {
             HttpEntity(data, headers),
             ShortUrlDataOut::class.java
         )
+    }
+
+    @Test
+    fun shouldReturnValidQRCode() {
+        val response = shortUrl("http://example.com/")
+
+        // Debugging output
+        println("Response Status: ${response.statusCode}")
+        println("Response Location: ${response.headers.location}")
+        println("Response Body: ${response.body}")
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/f684a3c4"))
+        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/f684a3c4"))
+        assertThat(response.body?.qrCode).isNotNull()
+
+        // Verify that the qrCode starts with the correct prefix
+        val qrCodeDataUrl = response.body?.qrCode
+        assertTrue(qrCodeDataUrl!!.startsWith("data:image/png;base64,"))
+
+        // Decode the base64 string
+        val base64Image = qrCodeDataUrl.removePrefix("data:image/png;base64,")
+        val imageBytes = Base64.getDecoder().decode(base64Image)
+        assertThat(imageBytes).isNotEmpty
+
+        // Read the image bytes to ensure it's a valid image
+        val bufferedImage = ImageIO.read(ByteArrayInputStream(imageBytes))
+        assertThat(bufferedImage).isNotNull
+        assertThat(bufferedImage.width).isGreaterThan(0)
+        assertThat(bufferedImage.height).isGreaterThan(0)
     }
 }

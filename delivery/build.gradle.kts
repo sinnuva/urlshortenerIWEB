@@ -34,8 +34,8 @@ dependencies {
     implementation("io.github.cdimascio:java-dotenv:5.2.2")
 
     implementation("org.json:json:20210307")
-    implementation("com.google.zxing:core:3.4.1")     // ZXing core library
-    implementation("com.google.zxing:javase:3.4.1")   // ZXing Java SE support
+    implementation("com.google.zxing:core:3.5.1")     // ZXing core library
+    implementation("com.google.zxing:javase:3.5.1")   // ZXing Java SE support
     // Include Kotlin Test as a test implementation dependency
     testImplementation(libs.kotlin.test)
 
