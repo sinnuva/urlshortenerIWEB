@@ -175,10 +175,10 @@ class UrlShortenerControllerTest {
             .andExpect(jsonPath("$.url").value("http://localhost/$hash"))
             .andReturn()
 
-        // Extract the QR code from the response and verify it's a valid base64 string
+        // Extract the QR code from the response and verify it's valid Base64
         val jsonResponse = result.response.contentAsString
         val qrCodeBase64 = extractJsonValue(jsonResponse, "qrCode")
-        assert(isValidBase64Image(qrCodeBase64)) { "Invalid base64 image data" }
+        assert(isValidBase64Image(qrCodeBase64)) { "Invalid Base64 image data" }
     }
 
     // Helper function to extract a value from JSON response
@@ -189,16 +189,11 @@ class UrlShortenerControllerTest {
     }
 
     // Helper function to validate base64 image data
-    private val logger = LoggerFactory.getLogger(UrlShortenerControllerTest::class.java)
-
+    // Helper function to validate base64 image data
     private fun isValidBase64Image(base64Data: String): Boolean {
-        return try {
-            val base64String = base64Data.substringAfter(",")
-            val decodedBytes = Base64.getDecoder().decode(base64String)
-            decodedBytes.isNotEmpty()
-        } catch (e: IllegalArgumentException) {
-            logger.error("Invalid Base64 data", e)
-            false
-        }
+        val base64String = base64Data.substringAfter(",")
+        val decodedBytes = Base64.getDecoder().decode(base64String)
+        return decodedBytes.isNotEmpty()
     }
+
 }
